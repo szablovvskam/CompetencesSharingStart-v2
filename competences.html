@@ -1,0 +1,64 @@
+﻿<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <title></title>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+        <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+        <script src="js/vue.js"> </script>
+        <script src="https://use.fontawesome.com/releases/v5.15.3/js/all.js" crossorigin="anonymous"></script>
+        <link href="https://fonts.googleapis.com/css?family=Raleway:100,100i,200,200i,300,300i,400,400i,500,500i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet" />
+        <link href="https://fonts.googleapis.com/css?family=Lora:400,400i,700,700i" rel="stylesheet" />
+        <link href="css/styles.css" rel="stylesheet" />
+    </head>
+<body>
+
+    <div id="app" style="padding: 2rem; font-family: Raleway"> 
+        <div class="input-group mb-3">
+            <input type="text" v-model="searchText" class="form-control" style="background-color: beige; border-color:#DEAE88" placeholder="Podaj nazwę kursu" aria-label="Username" aria-describedby="basic-addon1">
+        </div>
+        <div class ="row justify-content-center">
+            <div class="card" style="width: 18rem; background-color: beige; margin: 1rem" v-for="(competence,index) in filteredCompetencies">
+                <img class="card-img-top" v-bind:src="'assets/' + competence.Picture" alt="Card image cap">
+                <div class="card-body">
+                    <h5 class="card-title text-center">{{competence.Name.toUpperCase()}}</h5>
+                    <p class="card-text" v-bind:style="{color: competence.Time < 25 ? 'green': competence.Time > 25 ? 'red':'blue'}"> Czas trwania: {{competence.Time}} min</p>
+                    <p class="card-text">Opis: {{competence.Description}}</p>
+                </div>
+                <a v-bind:href="competence.Source" class="btn btn-primary" style="margin: 0.5rem; background-color: #DEAE88; border-color:#DEAE88; margin-top: auto;">Rozpocznij szkolenie</a>
+            </div>
+        </div>
+    </div>
+    
+
+    
+    <script>
+        new Vue({
+
+            el:"#app",
+            data:{
+                competencies: [],
+                searchText:"",
+            },
+            computed:{
+                filteredCompetencies: function(){
+                    let searchText = this.searchText;
+                    let competencies = this.competencies;
+    
+                    return competencies.filter(competence => {
+                        return !searchText || competence.Name.toUpperCase().includes(searchText.toUpperCase());
+                    })
+                }
+            },
+            created: function(){
+                let app = this;
+                fetch('http://competenciesms.azurewebsites.net/api/competencies/getlist')
+                    .then(response => response.json())
+                    .then(data => this.competencies=data);
+            }
+        })
+    </script>
+</body>
+</html>
